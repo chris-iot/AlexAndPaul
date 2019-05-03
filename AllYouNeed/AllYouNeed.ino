@@ -31,6 +31,10 @@ unsigned int endIndex;
 unsigned int mode;
 
 void setup() {
+  pinMode(12, INPUT_PULLUP);
+  pinMode(11, INPUT_PULLUP);
+  pinMode(10, INPUT_PULLUP);
+  pinMode(9,  INPUT_PULLUP);
   ws2812fx.init();
   ws2812fx.setBrightness(100);
   ws2812fx.setSpeed(400);
@@ -39,11 +43,22 @@ void setup() {
   arrIndex++;
   ws2812fx.start();
   Serial.begin(9600);
-  mode = RUN;
+  mode = CALM;
   time = millis();
 }
 
 void loop() {
+  if(!digitalRead(9)){
+    mode=CALM;
+  }else if(!digitalRead(10)){
+    mode=PSYCHO;
+  }else if(!digitalRead(11)){
+    mode=STROBO;
+  }else if(!digitalRead(12)){
+    mode=RUN;
+  }else{
+    mode=NOT_CONNECTED;
+  }
   ws2812fx.service();
   if(millis()-time>8000){
     time=millis();
@@ -51,17 +66,23 @@ void loop() {
       startIndex=0;
       endIndex=0;
     }else if(mode==CALM){
+      Serial.println("Mode is to calm");
       startIndex=calm_start;
       endIndex=calm_end;
     }else if(mode==PSYCHO){
+      Serial.println("Mode is to psycho");
       startIndex=psycho_start;
       endIndex=psycho_end;
     }else if(mode==STROBO){
+      Serial.println("Mode is to strobo");
       startIndex=strobo_start;
       endIndex=strobo_end;
     }else if(mode==RUN){
+      Serial.println("Mode is to runlight");
       startIndex=run_start;
       endIndex=run_end;
+    }else{
+      Serial.println("Mode is not connected");
     }
     if((arrIndex>endIndex)||(arrIndex<startIndex)){
       arrIndex=startIndex;
